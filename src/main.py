@@ -1,4 +1,4 @@
-from util.config import config
+from core.config import config
 from util.fs import make_category
 
 
