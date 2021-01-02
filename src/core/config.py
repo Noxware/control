@@ -42,10 +42,11 @@ class Category:
 class Config:
     def __init__(self, raw_config: Dict[str, Any]):
         self.src_folder: Path = Path(__file__).parent.parent
+        self.project_folder = self.src_folder.parent
         self.root_folder: Path = Path(raw_config['config']['root_folder'])
 
         if not self.root_folder.is_absolute():
-            self.root_folder = self.src_folder / self.root_folder
+            self.root_folder = self.project_folder / self.root_folder
 
         self.root_category: Category = Category(self.root_folder.name, raw_config['root'])
 
