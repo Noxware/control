@@ -1,15 +1,70 @@
-from core.config import Category
 from pathlib import Path
-from typing import Iterable, Callable, List, Optional, Dict
-from util.fs import cats2path, safe_move
+from typing import Iterable, Callable, List, Optional, Dict, Any
+from util.fs import safe_move
 
 
-class AskContext():
+class CoreException(Exception):
+    """Exception returned from this particular module"""
+    pass
+
+
+class Category:
+    def __init__(self, name: str, raw_category: Optional[Dict[str, Any]]):
+        rc = raw_category.copy() if raw_category is not None else {}
+
+        self.name: str = name
+        self.question: str = rc.pop('__question', 'How would you classify this?')
+        self.omit: bool = rc.pop('__omit', True)
+        self.self_included: bool = rc.pop('__self', True)
+        self.transparent: bool = rc.pop('__transparent', False)
+        self.ignored: bool = rc.pop('__ignored', False)
+        self.hint: Optional[str] = rc.pop('__hint', None)
+        self.children: Optional[Dict[str, Category]] = None
+
+        for key in list(rc.keys()):
+            if key.startswith('__'):
+                rc.pop(key)
+
+        if len(rc) > 0:
+            self.children = {}
+            for key, value in rc.items():
+                self.children[key] = Category(key, value)
+
+
+class AskContext:
     def __init__(self, file: Path, question: str, self_included: bool, category: Optional[Category]):
         self.file = file
         self.question = question
         self.self_included = self_included
         self.category = category
+
+
+def cats2path(cats: Iterable[Category]) -> Path:
+    """Takes a list of Category and returns a path to the folder"""
+    res = None
+
+    for c in cats:
+        if res is None:
+            res = Path(c.name)
+        else:
+            res = res / Path(c.name)
+
+    if res is None:
+        raise CoreException('Can not get items from the iterable [cats]')
+
+    return res
+
+
+def make_category(cat: Category, place: Path) -> None:
+    this_path = place / cat.name
+    this_path.mkdir(parents=True, exist_ok=True)
+
+    if cat.children is not None:
+        for n, c in cat.children.items():
+            if c is None:
+                (this_path / n).mkdir(parents=True, exist_ok=True)
+            else:
+                make_category(c, this_path)
 
 
 TransparencyTable = Dict[Category, Category]
@@ -126,6 +181,7 @@ def organize(file: Path, root_folder: Path, cats: CategoryPath) -> None:
 
 
 def run_base(files: Iterable[Path], root_folder: Path, root_cat: Category, choose: ChooseFunction) -> None:
+    make_category(root_cat, root_folder.parent)
     for f in files:
         cat_path = ask_full(f, root_cat, choose)
         organize(f, root_folder, cat_path)

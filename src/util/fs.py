@@ -1,6 +1,4 @@
-from core.config import Category
 from pathlib import Path
-from typing import Iterable
 from datetime import datetime
 from base64 import b32encode
 from random import randint
@@ -10,18 +8,6 @@ from shutil import move
 class FsException(Exception):
     """Exception returned from this particular module"""
     pass
-
-
-def make_category(cat: Category, place: Path) -> None:
-    this_path = place / cat.name
-    this_path.mkdir(parents=True, exist_ok=True)
-
-    if cat.children is not None:
-        for n, c in cat.children.items():
-            if c is None:
-                (this_path / n).mkdir(parents=True, exist_ok=True)
-            else:
-                make_category(c, this_path)
 
 
 # def filename_split_int(fn: str)
@@ -95,24 +81,8 @@ def safe_move(source: Path, target: Path) -> None:
     move(source, safe_path(target))
 
 
-def list_files(folder: Path):
+def iter_files(folder: Path):
     """Only iterates over files in a directory"""
     for p in folder.iterdir():
         if p.is_file():
             yield p
-
-
-def cats2path(cats: Iterable[Category]) -> Path:
-    """Takes a list of Category and returns a path to the folder"""
-    res = None
-
-    for c in cats:
-        if res is None:
-            res = Path(c.name)
-        else:
-            res = res / Path(c.name)
-
-    if res is None:
-        raise FsException('Can not get items from the iterable [cats]')
-
-    return res

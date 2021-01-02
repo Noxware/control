@@ -1,6 +1,6 @@
 from core.config import config, Category
 from core.core import run_base, AskContext
-from util.fs import list_files, make_category
+from util.fs import iter_files
 from typing import List
 from pathlib import Path
 
@@ -18,8 +18,7 @@ def choose(context: AskContext, options: List[Category]) -> Category:
 
 
 def main():
-    make_category(config.root_category, config.root_folder.parent)
-    run_base(list_files(Path('.')), config.root_folder, config.root_category, choose)
+    run_base(iter_files(Path('.')), config.root_folder, config.root_category, choose)
 
 
 if __name__ == '__main__':
