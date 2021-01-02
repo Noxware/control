@@ -86,3 +86,9 @@ def iter_files(folder: Path):
     for p in folder.iterdir():
         if p.is_file():
             yield p
+
+
+def iter_subfiles(folder: Path):
+    for p in folder.rglob('*'):
+        if p.is_file():
+            yield p
