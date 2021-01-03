@@ -11,8 +11,8 @@ file_types = {
         'jpg',
         'jpeg',
         'bmp',
-        'gif',
-        'webp',
+        #'gif',
+        #'webp',
         'png',
     ],
     'video': [
@@ -59,7 +59,7 @@ class Backend(QObject):
     @Slot(str, result=str)
     def get_file_type(self, f):
         p = Path(f)
-        s = p.suffix[1:]
+        s = p.suffix[1:].lower()
 
         if s in file_types['image']:
             return 'image'
