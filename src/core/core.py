@@ -171,7 +171,7 @@ def ask_full(file: Path, cat: Category, choose: ChooseFunction) -> CategoryPath:
     if selected_path[-1].children is None:
         return selected_path
     else:
-        return [*selected_path, *ask_single(file, selected_path[-1], choose)]
+        return [*selected_path, *ask_full(file, selected_path[-1], choose)]
 
 
 def organize(file: Path, root_folder: Path, cats: CategoryPath) -> None:

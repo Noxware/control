@@ -1,20 +1,55 @@
-import QtQuick 2.12
-import QtQuick.Controls 2.12
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import 'player'
 
-Rectangle {
-    color: "lightgray"
-    width: 200
-    height: 200
+ApplicationWindow {
+    id: root
+    width: 900
+    height: 700
+    title: qsTr('Control - Organizer')
+    visible: true
 
-    property int animatedValue: 0
-    SequentialAnimation on animatedValue {
-        loops: Animation.Infinite
-        PropertyAnimation { to: 150; duration: 1000 }
-        PropertyAnimation { to: 0; duration: 1000 }
+    readonly property var typeToViewer: {
+        'a': Text
     }
 
-    Text {
-        anchors.centerIn: parent
-        text: parent.animatedValue
+    /*menuBar: MenuBar {
+        Menu {
+            title: qsTr("&File")
+            Action { text: qsTr("&New...") }
+            Action { text: qsTr("&Open...") }
+            Action { text: qsTr("&Save") }
+            Action { text: qsTr("Save &As...") }
+            MenuSeparator { }
+            Action { text: qsTr("&Quit") }
+        }
+        Menu {
+            title: qsTr("&Edit")
+            Action { text: qsTr("Cu&t") }
+            Action { text: qsTr("&Copy") }
+            Action { text: qsTr("&Paste") }
+        }
+        Menu {
+            title: qsTr("&Help")
+            Action { text: qsTr("&About") }
+        }
+    }*/
+
+    SplitView {
+        anchors.fill: parent
+        Rectangle {
+            SplitView.fillWidth: true
+            color: 'red'
+        }
+
+        Rectangle {
+            color: 'blue'
+            SplitView.preferredWidth: 250
+            SplitView.minimumWidth: 200
+            Player {
+                anchors.centerIn: parent
+                file: JSON.stringify(backend.data)
+            }
+        }
     }
 }
