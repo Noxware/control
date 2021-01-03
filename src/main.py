@@ -5,7 +5,7 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
 from core.qmlcore import Backend, CategoryWrapper
-from core.core import run_base
+from core.core2 import CoreApp
 from core.config import config
 from util.fs import iter_files
 from pathlib import Path
@@ -16,7 +16,7 @@ def main():
     engine = QQmlApplicationEngine()
 
     # Instance of the Python object
-    backend = CategoryWrapper(config.root_category)
+    backend = Backend(CoreApp(iter_files(Path('.')), config.root_folder, config.root_category))
 
     # Expose the Python object to QML
     context = engine.rootContext()

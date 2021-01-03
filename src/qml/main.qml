@@ -13,6 +13,10 @@ ApplicationWindow {
         'a': Text
     }
 
+    Component.onCompleted: {
+        backend.wait_for_snapshot()
+    }
+
     /*menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
@@ -46,14 +50,9 @@ ApplicationWindow {
             color: 'blue'
             SplitView.preferredWidth: 250
             SplitView.minimumWidth: 200
-            Button {
-                text: 'prueba'
-                onClicked: backend.name = 'jaja'
-            }
 
             Player {
                 anchors.centerIn: parent
-                file: backend.name
             }
         }
     }

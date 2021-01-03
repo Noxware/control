@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Signal, Property, QUrl, Slot
 from core.core import Category
 from core.core2 import CoreApp, Snapshot
-from typing import List
+from typing import List, Optional
 
 
 class CategoryWrapper(QObject):
@@ -114,7 +114,16 @@ class SnapshotWrapper(QObject):
             self.m_options = o
             self.options_changed.emit(o)
 
+
 class Backend(QObject):
-    def __init__(self):
+    def __init__(self, app_core: CoreApp):
         QObject.__init__(self, None)  # parent null args removed
-        self.m_snapshot
+        self.app_core = app_core
+
+    @Slot(result=SnapshotWrapper)
+    def wait_for_snapshot(self) -> Optional[SnapshotWrapper]:
+        return SnapshotWrapper(self.app_core.wait_for_snapshot())
+
+    @Slot(CategoryWrapper)
+    def select(self, cat: CategoryWrapper) -> None:
+        self.app_core.select(cat.category)
