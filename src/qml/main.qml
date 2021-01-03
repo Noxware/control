@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+//import QtQuick.Dialogs 1.0
 import 'player'
 
 ApplicationWindow {
@@ -9,11 +10,22 @@ ApplicationWindow {
     title: qsTr('Control - Organizer')
     visible: true
 
+    /*MessageDialog {
+        id: finalDialog
+        title: "Control - Message"
+        text: "You organized everything here"
+        onAccepted: {
+            Qt.quit()
+        }
+    }*/
+
     property var snapshot
 
     function updateSnapshot() {
         root.snapshot = backend.wait_for_snapshot();
         if (!root.snapshot) {
+            //finalDialog.open();
+            console.log('Gui finished correctly.');
             Qt.quit();
         }
     }
@@ -35,6 +47,10 @@ ApplicationWindow {
                     width: parent.width
                     height: 40
                     text: snapshot.options[index].name
+                    hoverEnabled: true
+                    ToolTip.visible: hovered
+                    ToolTip.delay: 700
+                    ToolTip.text: snapshot.options[index].hint
                     onClicked: {
                         backend.select(snapshot.options[index].name)
                         root.updateSnapshot()
