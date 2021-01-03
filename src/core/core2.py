@@ -6,7 +6,7 @@ from threading import Thread, Event
 
 class RunBaseWrapper(Thread):
     def __init__(self, files: Iterable[Path], root_folder: Path, root_cat: Category):
-        super(RunBaseWrapper, self).__init__()
+        super(RunBaseWrapper, self).__init__(daemon=True)
         self.files = files
         self.root_folder = root_folder
         self.root_cat = root_cat
@@ -18,6 +18,7 @@ class RunBaseWrapper(Thread):
 
     def select(self, selected: Category):
         self.answer = selected
+        self.snapshot_ready.clear()
         self.answered.set()
 
     def wait_for_snapshot(self) -> Optional['Snapshot']:
@@ -31,7 +32,7 @@ class RunBaseWrapper(Thread):
         self.answered.clear()
         self.answered.wait()
 
-        self.snapshot_ready.clear()
+        # self.snapshot_ready.clear()
 
         assert self.answer is not None
         return self.answer
