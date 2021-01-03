@@ -57,6 +57,16 @@ class Snapshot:
         self.category = category
         self.options = options
 
+    def to_dict(self):
+        return {
+            'file': str(self.file.absolute()),  # Fix?
+            'question': self.question,
+            'self_included': self.self_included,
+            'category': self.category.to_dict(),
+            'options': [c.to_dict() for c in self.options]
+            ###
+        }
+
 
 class CoreApp:
     def __init__(self, files: Iterable[Path], root_folder: Path, root_cat: Category):

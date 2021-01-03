@@ -30,6 +30,18 @@ class Category:
             for key, value in rc.items():
                 self.children[key] = Category(key, value)
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'question': self.question,
+            'omit': self.omit,
+            'self_included': self.self_included,
+            'transparent': self.transparent,
+            'ignored': self.ignored,
+            'hint': self.hint,
+            # 'children':
+        }
+
 
 class AskContext:
     def __init__(self, file: Path, question: str, self_included: bool, category: Optional[Category]):

@@ -1,10 +1,11 @@
 import sys
 from os.path import abspath, dirname, join
+from PySide6 import QtCore
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtQml import QQmlApplicationEngine
+from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 
-from core.qmlcore import Backend, CategoryWrapper
+from core.qmlcore import Backend
 from core.core2 import CoreApp
 from core.config import config
 from util.fs import iter_files
@@ -21,6 +22,8 @@ def main():
     # Expose the Python object to QML
     context = engine.rootContext()
     context.setContextProperty("backend", backend)
+
+    #qmlRegisterType(Test, 'TestTypes', 1, 0, 'Test')
 
     # Get the path of the current directory, and then add the name
     # of the QML file, to load it.

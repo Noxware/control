@@ -9,51 +9,39 @@ ApplicationWindow {
     title: qsTr('Control - Organizer')
     visible: true
 
-    readonly property var typeToViewer: {
-        'a': Text
+    property var snapshot
+
+    function updateSnapshot() {
+        root.snapshot = backend.wait_for_snapshot();
+        if (!root.snapshot) {
+            Qt.quit();
+        }
     }
 
     Component.onCompleted: {
-        backend.wait_for_snapshot()
+        updateSnapshot();
     }
-
-    /*menuBar: MenuBar {
-        Menu {
-            title: qsTr("&File")
-            Action { text: qsTr("&New...") }
-            Action { text: qsTr("&Open...") }
-            Action { text: qsTr("&Save") }
-            Action { text: qsTr("Save &As...") }
-            MenuSeparator { }
-            Action { text: qsTr("&Quit") }
-        }
-        Menu {
-            title: qsTr("&Edit")
-            Action { text: qsTr("Cu&t") }
-            Action { text: qsTr("&Copy") }
-            Action { text: qsTr("&Paste") }
-        }
-        Menu {
-            title: qsTr("&Help")
-            Action { text: qsTr("&About") }
-        }
-    }*/
 
     SplitView {
         anchors.fill: parent
-        Rectangle {
+        Player {
             SplitView.fillWidth: true
-            color: 'red'
+            file: snapshot.file
         }
 
-        Rectangle {
-            color: 'blue'
+        ListView {
+            model: snapshot.options
+            delegate: Button {
+                    width: parent.width
+                    height: 40
+                    text: snapshot.options[index].name
+                    onClicked: {
+                        backend.select(snapshot.options[index].name)
+                        root.updateSnapshot()
+                    }
+            }
             SplitView.preferredWidth: 250
             SplitView.minimumWidth: 200
-
-            Player {
-                anchors.centerIn: parent
-            }
         }
     }
 }
