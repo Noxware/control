@@ -3,3 +3,6 @@ omit
 trash
 
 allow / in names and other special chars
+
+custom file extension asociated to open config file
+stored on each root folder where, double click and go
