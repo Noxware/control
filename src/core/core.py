@@ -9,6 +9,11 @@ class CoreException(Exception):
 
 
 class Category:
+    """
+    Represents a category. An option to classify a file.
+
+    It is also reused to transport messages (fake category).
+    """
     def __init__(self, name: str, raw_category: Optional[Dict[str, Any]]):
         rc = raw_category.copy() if raw_category is not None else {}
 
@@ -20,6 +25,7 @@ class Category:
         self.ignored: bool = rc.pop('__ignored', False)
         self.hint: Optional[str] = rc.pop('__hint', None)
         self.children: Optional[Dict[str, Category]] = None
+        self.fake: str = None
 
         for key in list(rc.keys()):
             if key.startswith('__'):
@@ -31,6 +37,11 @@ class Category:
                 self.children[key] = Category(key, value)
 
     def to_dict(self):
+        """
+        Converts the object into a dict (only essential data).
+
+        Useful to work with json communication.
+        """
         return {
             'name': self.name,
             'question': self.question,
@@ -42,8 +53,24 @@ class Category:
             # 'children':
         }
 
+    @classmethod
+    def fake(cls, name: str, msg: str):
+        """
+        Makes a fake category that contains a certain name and message.
+
+        Fake categories are just a dirty mechanism to communicate special actions
+        (like omit).
+        """
+        res = cls(name, {
+            "__question": "",
+        })
+        res.fake = msg
+
+        return res
+
 
 class AskContext:
+    """Information about the context of the current question"""
     def __init__(self, file: Path, question: str, self_included: bool, category: Optional[Category]):
         self.file = file
         self.question = question
@@ -68,6 +95,7 @@ def cats2path(cats: Iterable[Category]) -> Path:
 
 
 def make_category(cat: Category, place: Path) -> None:
+    """Makes the category folder structure"""
     this_path = place / cat.name
     this_path.mkdir(parents=True, exist_ok=True)
 
