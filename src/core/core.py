@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Iterable, Callable, List, Optional, Dict, Any
+from typing import Iterable, Callable, List, Optional, Dict, Any, Union
 from util.fs import safe_move
 
 
@@ -25,7 +25,7 @@ class Category:
         self.ignored: bool = rc.pop('__ignored', False)
         self.hint: Optional[str] = rc.pop('__hint', None)
         self.children: Optional[Dict[str, Category]] = None
-        self.fake: str = None
+        self.fake: Optional[str] = None
 
         for key in list(rc.keys()):
             if key.startswith('__'):
@@ -50,11 +50,12 @@ class Category:
             'transparent': self.transparent,
             'ignored': self.ignored,
             'hint': self.hint,
+            'fake': self.fake,
             # 'children':
         }
 
     @classmethod
-    def fake(cls, name: str, msg: str):
+    def make_fake(cls, name: str, msg: str):
         """
         Makes a fake category that contains a certain name and message.
 
@@ -62,7 +63,7 @@ class Category:
         (like omit).
         """
         res = cls(name, {
-            "__question": "",
+            '__question': '',
         })
         res.fake = msg
 
@@ -70,7 +71,11 @@ class Category:
 
 
 class AskContext:
-    """Information about the context of the current question"""
+    """
+    Information about the context of the current question
+
+    Not very used with new apis.
+    """
     def __init__(self, file: Path, question: str, self_included: bool, category: Optional[Category]):
         self.file = file
         self.question = question
@@ -171,7 +176,7 @@ def resolve_transparency(cat: Category, table: TransparencyTable) -> CategoryPat
 ChooseFunction = Callable[[AskContext, List[Category]], Category]
 
 
-def ask_single(file: Path, cat: Category, choose: ChooseFunction) -> CategoryPath:
+def ask_single(file: Path, cat: Category, choose: ChooseFunction) -> Union[CategoryPath, str]:
     """
     Generic algorithm builds the path of categories. It needs a choose function to ask
     the user. The function must list the categories in the second parameter but it also
@@ -179,12 +184,13 @@ def ask_single(file: Path, cat: Category, choose: ChooseFunction) -> CategoryPat
 
     Transparency and other things are automatically handled if you use this function.
 
+    This function can also return a special string message if a fake option has been selected.
 
     :param file:
     :param cat:
     :param choose:
 
-    :return: Category path
+    :return: Category path or special message
     """
 
     t_table: TransparencyTable = {}
@@ -202,12 +208,26 @@ def ask_single(file: Path, cat: Category, choose: ChooseFunction) -> CategoryPat
                 if not c2.transparent:
                     choose_from.append(c2)
 
+    # Normally omit always
+    if cat.omit:
+        choose_from.append(Category.make_fake('Omit', 'omit'))
+
     selected = choose(AskContext(file, cat.question, cat.self_included, cat), choose_from)
+
+    # Returns the special message if any
+    if selected.fake is not None:
+        return selected.fake
+
     return resolve_transparency(selected, t_table)
 
 
-def ask_full(file: Path, cat: Category, choose: ChooseFunction) -> CategoryPath:
+def ask_full(file: Path, cat: Category, choose: ChooseFunction) -> Union[CategoryPath, str]:
     selected_path = ask_single(file, cat, choose)
+
+    # Handle special message
+    if isinstance(selected_path, str):
+        return selected_path
+
     if selected_path[-1].children is None:
         return selected_path
     else:
@@ -224,4 +244,13 @@ def run_base(files: Iterable[Path], root_folder: Path, root_cat: Category, choos
     make_category(root_cat, root_folder.parent)
     for f in files:
         cat_path = ask_full(f, root_cat, choose)
+
+        # Handle special messages
+        if isinstance(cat_path, str):
+            m = cat_path
+            if m == 'omit':
+                continue
+            else:
+                raise CoreException(f'Unknown fake category message "{m}"')
+
         organize(f, root_folder, cat_path)
