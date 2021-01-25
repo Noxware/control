@@ -6,3 +6,8 @@ allow / in names and other special chars
 
 custom file extension asociated to open config file
 stored on each root folder where, double click and go
+
+----------
+
+implement register_fake_category or register_interceptor (to intercept every option), or a combination of both
+Fix click to fast on option make locks confuse
