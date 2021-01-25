@@ -228,10 +228,18 @@ def ask_full(file: Path, cat: Category, choose: ChooseFunction) -> Union[Categor
     if isinstance(selected_path, str):
         return selected_path
 
+    res: Union[CategoryPath, str]
+
     if selected_path[-1].children is None:
         return selected_path
     else:
-        return [*selected_path, *ask_full(file, selected_path[-1], choose)]
+        rec = ask_full(file, selected_path[-1], choose)
+
+        # Handle special message
+        if isinstance(rec, str):
+            return rec
+        else:
+            return [*selected_path, *rec]
 
 
 def organize(file: Path, root_folder: Path, cats: CategoryPath) -> None:
