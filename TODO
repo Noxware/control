@@ -10,4 +10,6 @@ stored on each root folder where, double click and go
 ----------
 
 implement register_fake_category or register_interceptor (to intercept every option), or a combination of both
-Fix click to fast on option make locks confuse
+Fix click too fast on option make locks confuse
+allow to copy test
+webview for textfiles with link inside

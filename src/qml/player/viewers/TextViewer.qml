@@ -12,6 +12,7 @@ Item {
         TextArea {
             text: backend.get_file_content(file)
             readOnly: true
+            selectByMouse: true
         }
     }
 

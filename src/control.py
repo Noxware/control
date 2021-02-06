@@ -1,5 +1,6 @@
 import sys
 from os.path import abspath, dirname, join
+from typing import List
 from PySide6 import QtCore
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtGui import QGuiApplication
@@ -7,12 +8,14 @@ from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 
 from core.qmlcore import Backend
 from core.core2 import CoreApp
-from core.config import config
+from core.config import Config
 from util.fs import iter_files
 from pathlib import Path
 
 
-def main():
+def main(argv: List[str]):
+    config = Config(Path(argv[1]))
+
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
@@ -37,4 +40,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

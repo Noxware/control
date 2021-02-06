@@ -1,3 +1,6 @@
+# type: ignore
+
+from PySide6 import QtCore
 from PySide6.QtCore import QObject, Signal, Property, QUrl, Slot
 from core.core import Category
 from core.core2 import CoreApp, Snapshot
