@@ -11,6 +11,7 @@ from core.core2 import CoreApp
 from core.config import Config
 from util.fs import iter_files
 from pathlib import Path
+from datetime import datetime
 
 
 def main(argv: List[str]):
@@ -40,4 +41,10 @@ def main(argv: List[str]):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    try:
+        main(sys.argv)
+    except Exception as e:
+        dt = datetime.now()
+
+        with open('control.log', 'a') as log:
+            log.write(f'---------- {dt.year}/{dt.month}/{dt.day}\n' + str(e))
