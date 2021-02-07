@@ -21,11 +21,11 @@ def main(argv: List[str]):
     engine = QQmlApplicationEngine()
 
     # Instance of the Python object
-    backend = Backend(CoreApp(iter_files(Path('.')), config.root_folder, config.root_category))
+    backend = Backend(CoreApp(iter_files(Path('.'), config.exceptions), config.root_folder, config.root_category))
 
     # Expose the Python object to QML
     context = engine.rootContext()
-    context.setContextProperty("backend", backend)
+    context.setContextProperty('backend', backend)
 
     #qmlRegisterType(Test, 'TestTypes', 1, 0, 'Test')
 

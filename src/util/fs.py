@@ -3,6 +3,8 @@ from datetime import datetime
 from base64 import b32encode
 from random import randint
 from shutil import move
+from typing import List, Optional
+from fnmatch import fnmatch
 
 
 class FsException(Exception):
@@ -80,15 +82,27 @@ def safe_move(source: Path, target: Path) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
     move(source, safe_path(target))
 
+def _matchAny(fname: str, patterns: Optional[List[str]]) -> bool:
+    """
+    Checks if a filename has a certian unix pattern (case insensitive).
+    
+    Returns false if patterns is None.
+    """
+    if patterns is not None:
+        for p in patterns:
+            if fnmatch(fname, p):
+                return True
 
-def iter_files(folder: Path):
+    return False
+
+def iter_files(folder: Path, exceptions: Optional[List[str]] = None):
     """Only iterates over files in a directory"""
     for p in folder.iterdir():
-        if p.is_file():
+        if p.is_file() and not _matchAny(p.name, exceptions):
             yield p
 
 
-def iter_subfiles(folder: Path):
-    for p in folder.rglob('*'):
-        if p.is_file():
-            yield p
+#def iter_subfiles(folder: Path):
+#    for p in folder.rglob('*'):
+#        if p.is_file():
+#            yield p

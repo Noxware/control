@@ -1,7 +1,7 @@
 # Imports
 from core.core import Category
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 import yaml
 
 
@@ -19,6 +19,7 @@ class Config:
         #self.project_folder = self.src_folder.parent
         self.config_file_folder: Path = f.parent
         self.root_folder: Path = Path(raw_config['config']['root_folder'])
+        self.exceptions: List[str] = raw_config['config']['exceptions']
 
         if not self.root_folder.is_absolute():
             self.root_folder = self.config_file_folder / self.root_folder
